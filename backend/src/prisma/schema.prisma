@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Auth models
+model User {
+  id         String         @id @default(uuid())
+  email      String         @unique
+  name       String?
+  createdAt  DateTime       @default(now())
+  identities UserIdentity[]
+  isDeleted  Boolean?
+
+  @@index([email])
+}
+
+model UserIdentity {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider   String // 'Google', 'GitHub', 'EmailPassword', 'PhoneOTP', etc.
+  providerId String // Provider's unique user ID (or email for email/password)
+  metadata   Json? // Provider-specific data (passwordHash, tokens, profile data, etc.)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isDeleted  Boolean?
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}
+
+
+model Otp {
+
+
+  id         String   @id @default(uuid())
+
+
+  identifier String   // Phone number or email address
+
+
+  type       String   // 'phone' or 'email'
+
+
+  otp        String   // Hashed OTP
+
+
+  expiresAt  DateTime
+
+
+  attempts   Int      @default(0)
+
+
+  verified   Boolean  @default(false)
+
+
+  purpose    String?  // 'login', 'registration', 'password_reset', '2fa', etc.
+
+
+  createdAt  DateTime @default(now())
+
+
+  updatedAt  DateTime @updatedAt
+
+
+  isDeleted  Boolean?
+
+
+
+
+
+  @@index([identifier, type])
+
+
+  @@index([expiresAt])
+
+
+  @@index([identifier, type, verified])
+
+
+}
+
+
+
+
+
+model Lead {
+  id                 Int      @id @default(autoincrement())
+  company            String
+  websiteUrl         String?
+  industry           String?
+  employeeCount      String?
+  revenue            String?
+  hqLocation         String?
+  foundedYear        Int?
+  description        String?
+  fitScore           Int?
+  status             String   @default("new") // 'new', 'enriched', 'contacted'
+  
+  // Enrichment details
+  name               String?
+  title              String?
+  email              String?
+  linkedinUrl        String?
+  techStack          String[]
+  recentNews         String[]
+  painPoints         String[]
+  competitiveLandscape String?
+  enrichmentScore    String? // 'High', 'Medium', 'Low'
+
+  // NEW Deep Enrichment Fields
+  contacts           Json? // Store array of contacts: { name, title, roleRelevance, email, linkedinUrl }
+  estimatedToolSpend String?
+  growthStage        String?
+  triggers           Json? // Store array of triggers: { description, date, impact }
+  buyingIntentSignals String[]
+  budgetTiming       String?
+  competitors        Json? // Store array of competitors: { name, positioning, differentiation }
+
+  // Outreach details
+  outreachSequences  Json? // Store complex outreach data
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  isDeleted          Boolean  @default(false)
+
+  @@index([status])
+  @@index([fitScore])
+  @@index([isDeleted])
+}
+
+
+
+
+
+model ICP {
+
+
+  id                 Int      @id @default(autoincrement())
+
+
+  industry           String?
+
+
+  companySize        String?
+
+
+  revenueRange       String?
+
+
+  geography          String[]
+
+
+  targetJobTitles    String[]
+
+
+  technologyKeywords String[]
+
+
+  
+
+
+  createdAt          DateTime @default(now())
+
+
+  updatedAt          DateTime @updatedAt
+
+
+  isDeleted          Boolean  @default(false)
+
+
+}
+
