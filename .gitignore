@@ -30,3 +30,7 @@ Thumbs.db
 
 # TypeScript cache
 *.tsbuildinfo
+
+# Project planning docs
+IMPLEMENTATION_SUMMARY.md
+APPLICATION_PLAN.md
