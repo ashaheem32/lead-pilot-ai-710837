@@ -23,7 +23,9 @@ import {
   Plus,
   Layers,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  RotateCcw,
+  AlertTriangle
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -45,8 +47,8 @@ const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"
 const REVENUE_RANGES = ["Pre-revenue", "$0-$1M", "$1M-$10M", "$10M-$50M", "$50M-$100M", "$100M+"];
 
 const GEOGRAPHIES = [
-  "North America", "Europe", "Asia-Pacific", "Latin America", 
-  "Middle East & Africa", "Global"
+  "Africa", "Asia", "Australia / Oceania", "Europe",
+  "North America", "South America", "Middle East", "Global"
 ];
 
 const PRESET_JOB_TITLES = [
@@ -56,7 +58,7 @@ const PRESET_JOB_TITLES = [
 
 export const LeadFinder = () => {
   const navigate = useNavigate();
-  const { addLeads, setCurrentICP, currentICP } = useLeads();
+  const { addLeads, setCurrentICP, currentICP, resetFinds, leads } = useLeads();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +68,7 @@ export const LeadFinder = () => {
   const [fitScoreRange, setFitScoreRange] = useState<[number, number]>([0, 100]);
   const [industryFilter, setIndustryFilter] = useState<string>('All');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Lead, direction: 'asc' | 'desc' } | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   
   const [icp, setIcp] = useState<ICP>(currentICP || {
     industry: '',
@@ -136,6 +139,14 @@ export const LeadFinder = () => {
     setSelectedIds(new Set());
   };
 
+  const handleReset = () => {
+    resetFinds();
+    setResults([]);
+    setSelectedIds(new Set());
+    setShowResetConfirm(false);
+    showToast('All finds have been reset. Websites will appear as new.', 'success');
+  };
+
   const handleEnrichSelected = () => {
     const resultsArray = Array.isArray(results) ? results : [];
     const selectedLeads = resultsArray.filter(l => selectedIds.has(l.id));
@@ -185,6 +196,38 @@ export const LeadFinder = () => {
 
   return (
     <div className="space-y-6">
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-2xl max-w-sm w-full mx-4 space-y-4">
+            <div className="flex items-center gap-3 text-orange-500">
+              <div className="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center">
+                <AlertTriangle size={20} />
+              </div>
+              <h3 className="text-base font-bold text-foreground">Reset All Finds?</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              This will remove all <span className="font-bold text-foreground">{leads.length} lead{leads.length !== 1 ? 's' : ''}</span> from your pipeline — including enriched and contacted ones. All websites will appear as new in future searches.
+            </p>
+            <p className="text-xs text-muted-foreground">Your ICP and product context will be kept.</p>
+            <div className="flex gap-3 pt-1">
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl border border-border text-sm font-bold hover:bg-muted transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReset}
+                className="flex-1 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold transition-all flex items-center justify-center gap-2"
+              >
+                <RotateCcw size={14} />
+                Reset Finds
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-primary/5 to-transparent p-6 rounded-xl border border-border">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-primary">
@@ -194,6 +237,15 @@ export const LeadFinder = () => {
           <h1 className="text-3xl font-bold tracking-tight">Lead Finder</h1>
           <p className="text-muted-foreground text-sm">Define your Ideal Customer Profile and find your next big wins.</p>
         </div>
+        {leads.length > 0 && (
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-orange-500/30 text-orange-500 bg-orange-500/5 hover:bg-orange-500/10 text-xs font-bold uppercase tracking-widest transition-all"
+          >
+            <RotateCcw size={14} />
+            Reset Last Finds
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

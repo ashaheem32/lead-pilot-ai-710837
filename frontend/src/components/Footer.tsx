@@ -15,8 +15,6 @@ export const Footer: React.FC<FooterProps> = ({ isSidebarCollapsed }) => {
       <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-muted-foreground font-medium">
         <div className="flex items-center gap-4">
           <span className="text-foreground font-bold uppercase tracking-widest text-[10px]">LeadPilot AI v1.0</span>
-          <div className="w-1.5 h-1.5 rounded-full bg-border"></div>
-          <p>Built on <span className="text-primary font-bold">Mattr</span></p>
         </div>
 
         <nav className="flex items-center gap-6">

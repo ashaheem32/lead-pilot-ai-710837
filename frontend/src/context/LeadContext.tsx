@@ -14,6 +14,7 @@ interface LeadContextType {
   showOnboarding: boolean;
   setShowOnboarding: (show: boolean) => void;
   clearAllData: () => void;
+  resetFinds: () => void;
 }
 
 const LeadContext = createContext<LeadContextType | undefined>(undefined);
@@ -104,6 +105,11 @@ export const LeadProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('productContext');
   };
 
+  const resetFinds = () => {
+    setLeads([]);
+    localStorage.removeItem('leads');
+  };
+
   const updateLead = (id: string, updates: Partial<Lead>) => {
     setLeads(prev => {
       const prevArray = Array.isArray(prev) ? prev : [];
@@ -129,19 +135,20 @@ export const LeadProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <LeadContext.Provider value={{ 
-      leads, 
-      setLeads, 
-      currentICP, 
-      setCurrentICP, 
-      productContext, 
-      setProductContext, 
-      updateLead, 
-      addLeads, 
+    <LeadContext.Provider value={{
+      leads,
+      setLeads,
+      currentICP,
+      setCurrentICP,
+      productContext,
+      setProductContext,
+      updateLead,
+      addLeads,
       removeLead,
       showOnboarding,
       setShowOnboarding,
-      clearAllData
+      clearAllData,
+      resetFinds
     }}>
       {children}
     </LeadContext.Provider>
